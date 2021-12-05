@@ -1,6 +1,6 @@
-package com.example.openweatherapidemo.repository;
+package com.example.weather.repository;
 
-import com.example.openweatherapidemo.model.Weather;
+import com.example.weather.model.Weather;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

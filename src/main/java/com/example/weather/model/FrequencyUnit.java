@@ -1,4 +1,4 @@
-package com.example.openweatherapidemo.model;
+package com.example.weather.model;
 
 public enum FrequencyUnit {
     SECOND("second"),

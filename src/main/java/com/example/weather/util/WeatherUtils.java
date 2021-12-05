@@ -1,6 +1,6 @@
-package com.example.openweatherapidemo.util;
+package com.example.weather.util;
 
-import com.example.openweatherapidemo.model.Weather;
+import com.example.weather.model.Weather;
 import com.jayway.jsonpath.JsonPath;
 import lombok.SneakyThrows;
 import org.springframework.core.env.Environment;
