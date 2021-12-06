@@ -2,12 +2,15 @@ package com.example.weather.data;
 
 import com.example.weather.model.FrequencyUnit;
 import com.example.weather.model.Weather;
+import org.assertj.core.util.Lists;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
 
 public class TestData {
-    public static String url = "https://api.openweathermap.org/data/2.5/weather?q=helsinki&units=metric&APPID=5536a9b0c84d081997982254c24fc53a";
+    public static String url = "https://api.openweathermap.org/data/2.5/weather?q=espoo&units=metric&APPID=5536a9b0c84d081997982254c24fc53a";
     public static String jsonTestWeatherData =
     """
     {
@@ -55,16 +58,26 @@ public class TestData {
    }
    """;
 
-
-    public static Weather getCsvWeatherConfig() throws URISyntaxException {
-        Weather csvWeatherConfig = new Weather();
-        csvWeatherConfig.setFrequencyUnit(FrequencyUnit.SECOND.name());
-        csvWeatherConfig.setFrequency(5);
-        csvWeatherConfig.setUri(new URI(url));
-        csvWeatherConfig.setTempLimit(3);
-        return csvWeatherConfig;
+    public static Weather getWeather() throws URISyntaxException {
+        Weather weather = new Weather();
+        weather.setCity("espoo");
+        weather.setFrequencyUnit(FrequencyUnit.SECOND.name());
+        weather.setFrequency(5);
+        weather.setUri(new URI(url));
+        weather.setTempLimit(3);
+        weather.setMaxTemp(5.5);
+        weather.setMinTemp(2.2);
+        weather.setFeelsLike(3.3);
+        return weather;
     }
 
+    public static Optional<List<Weather>> getOptionalWeather() throws URISyntaxException {
+        Optional<List<Weather>> optionalWeathers = Optional.of( Lists.list(getWeather()));
+        return optionalWeathers;
+    }
 
+    public static List<Weather> getWeatherList() throws URISyntaxException {
+        return Lists.list(getWeather());
+    }
 
 }

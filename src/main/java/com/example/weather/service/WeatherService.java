@@ -8,12 +8,14 @@ import com.example.weather.util.WeatherUtils;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import net.bytebuddy.pool.TypePool;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
@@ -33,37 +35,40 @@ public class WeatherService {
         return new RestTemplate(factory);
     }
 
-    public void insertWeather(Weather weather){
-        repository.save(weather);
+    public void insertWeather(Weather weather) {
+       repository.save(weather);
     }
 
-    public List<Weather> getAllWeather(){
+    public List<Weather> getAllWeather() {
         return repository.findAll();
     }
 
-    public List<Weather> getWeatherByCity(String cityName){
+    public List<Weather> getWeatherByCity(String cityName) {
         var weathers = repository.findAllByCity(cityName);
-        if(weathers.isPresent()){
-           return weathers.get();
+        if (weathers.isPresent()) {
+            return weathers.get();
         }
         return null;
     }
 
     @Async
-    public void cityForecastByFrequency(String cityName){
+    public Weather cityForecastByFrequency(String cityName) {
         var weathers = repository.findAllByCity(cityName);
-        if(weathers.isPresent()){
+        if (weathers.isPresent()) {
             var foundWeathers = weathers.get();
-            Weather lastCityWeather = foundWeathers.get(foundWeathers.size()-1);
-            lastCityWeather.setTempLimit(ConfigReader.weathers.get(ConfigReader.weathers.size() -1).getTempLimit());
-            lastCityWeather.setFrequency(ConfigReader.weathers.get(ConfigReader.weathers.size() -1).getFrequency());
-            lastCityWeather.setFrequencyUnit(ConfigReader.weathers.get(ConfigReader.weathers.size() -1).getFrequencyUnit());
-            callApi(lastCityWeather);
+            if(foundWeathers.size() > 0){
+                Weather lastCityWeather = foundWeathers.get(foundWeathers.size()-1);
+                lastCityWeather.setTempLimit(ConfigReader.weathers.get(ConfigReader.weathers.size() -1).getTempLimit());
+                lastCityWeather.setFrequency(ConfigReader.weathers.get(ConfigReader.weathers.size() -1).getFrequency());
+                lastCityWeather.setFrequencyUnit(ConfigReader.weathers.get(ConfigReader.weathers.size() -1).getFrequencyUnit());
+                return callApi(lastCityWeather);
+            }
         }
+        return null;
     }
 
     @SneakyThrows
-    public void callApi(Weather weather){
+    public Weather callApi(Weather weather) {
         RestTemplate restTemplate = restTemplate();
         CallableWeatherApi callableWeatherApi = new CallableWeatherApi(restTemplate, weather.getUri());
         ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
@@ -71,7 +76,7 @@ public class WeatherService {
         FrequencyUnit frequencyUnit = FrequencyUnit.valueOf(FrequencyUnit.class, unit);
         long delay = weather.getFrequency();
         Future<String> resultFuture = null;
-        switch (frequencyUnit){
+        switch (frequencyUnit) {
             case SECOND:
                 resultFuture = executorService.schedule(callableWeatherApi, delay, TimeUnit.SECONDS);
                 break;
@@ -89,16 +94,19 @@ public class WeatherService {
         }
         String result = resultFuture.get();
         log.info(result);
-        insertWeather( WeatherUtils.buildWeather(result, weather));
+        Weather newWeather = WeatherUtils.buildWeather(result, weather);
+        insertWeather(newWeather);
         executorService.shutdown();
+        newWeather.setUri(null);
+        return newWeather;
     }
 
-    public void fetchWeatherData(){
+    public void fetchWeatherData() {
         RestTemplate restTemplate = restTemplate();
         ConfigReader.weathers.forEach(weather -> {
             var result = restTemplate.getForEntity(weather.getUri(), String.class);
             log.info(result.getBody());
-            insertWeather( WeatherUtils.buildWeather(result.getBody(), weather));
+            insertWeather(WeatherUtils.buildWeather(result.getBody(), weather));
         });
     }
 }

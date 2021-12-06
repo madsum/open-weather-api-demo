@@ -11,11 +11,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.env.Environment;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(
         classes = OpenWeatherApiDemoApplication.class,
@@ -37,7 +40,7 @@ class WeatherUtilsTest {
     @Test
     void buildWeather() throws URISyntaxException {
        Weather weather = WeatherUtils.buildWeather(TestData.jsonTestWeatherData,
-                                                TestData.getCsvWeatherConfig());
+                                                TestData.getWeather());
        assertNotNull(weather);
        weather.setId(1l);
        assertThat(weather).hasNoNullFieldsOrProperties();
@@ -49,5 +52,12 @@ class WeatherUtilsTest {
       assertNotNull(uri);
     }
 
-
+    @Test
+    void readCsvConfig(){
+        InputStream resource = OpenWeatherApiDemoApplication.class.getResourceAsStream("/config.csv");
+        System.out.println(resource.toString());
+        List<Weather> actualWeathers = WeatherUtils.readCsvConfig(resource, environment);
+        assertNotNull(actualWeathers);
+        assertTrue(actualWeathers.size() == 1);
+    }
 }
