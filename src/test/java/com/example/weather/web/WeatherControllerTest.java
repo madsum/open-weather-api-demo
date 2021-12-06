@@ -69,14 +69,14 @@ class WeatherControllerTest {
 
     }
 
-    @Test
+/*    @Test
     void cityForecastByFrequency() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post(WeatherController.WEATHER+WeatherController.POST_CITY_FORECAST_BY_FREQUENCY+"/espoo"))
-/*                .andExpect(jsonPath("$[0].city")
-                                .value(capitalize(TestData.getWeather().getCity())))*/
+*//*                .andExpect(jsonPath("$[0].city")
+                                .value(capitalize(TestData.getWeather().getCity())))*//*
                         .andDo(MockMvcResultHandlers.print());
 
         //        .
 
-    }
+    }*/
 }

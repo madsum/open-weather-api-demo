@@ -1,0 +1,6 @@
+version: "3.3"
+services:
+  open-weather-api-demo:
+    build: .
+    ports:
+      - "8080:8080"
