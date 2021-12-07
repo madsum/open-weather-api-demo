@@ -61,6 +61,7 @@ public class TestData {
     public static Weather getWeather() throws URISyntaxException {
         Weather weather = new Weather();
         weather.setCity("espoo");
+        weather.setCountry("FI");
         weather.setFrequencyUnit(FrequencyUnit.SECOND.name());
         weather.setFrequency(5);
         weather.setUri(new URI(url));
